@@ -1,4 +1,4 @@
-import code_cleanup, re
+import code_cleanup, re, math, functioner
 
 operators = ["+-", "&=", "^=", "|=", "/=", "<<=", "%=", "*=", ">>=",
              "-=", "&&", "||", ",", "/", "%", "*", ".", "->",
@@ -19,8 +19,10 @@ class Holsted:
     total_operands_count = 0
     unique_operands_count = 0
     cleaned_code = ""
+    text = ""
 
     def __init__(self, code):
+        self.text = code
         cleaned_code = code_cleanup.cleanup_sharp(code)
         cleaned_code = code_cleanup.cleanup_comments(cleaned_code)
         (cleaned_code, total_string_count, unique_string_count) = code_cleanup.cleanup_and_get_strings_count(cleaned_code)
@@ -62,15 +64,59 @@ class Holsted:
         self.total_operands_count = len(operands)
         self.unique_operands_count = len(set(operands))
 
+    def get_theoretical_program_dictionary(self):
+        functions = functioner.get_function_declaration(self.text)
+        n1s = 0
+        n2s = 0
+        for func in functions:
+            n2s += len(func[2].split(","))
+        n1s = len(functions)
+        return n1s, n2s
+
     def run(self):
         self.get_all_operators()
         self.get_all_operands()
+
+        n1 = self.unique_operators_count
+        n2 = self.unique_operands_count
+        N1 = self.total_operators_count
+        N2 = self.total_operands_count
 
         print("Общее число операторов (N1): ", self.total_operators_count)
         print("Число уникальных операторов (n1): ", self.unique_operators_count)
         print("Общее число операндов (N2): ", self.total_operands_count)
         print("Число уникальных операндов (n2): ", self.unique_operands_count)
 
-        print("Алфавит (n): ", self.unique_operators_count + self.unique_operands_count)
-        print("Экспериментальна длина программы (Nэ): ", self.total_operators_count + self.total_operands_count)
-        print("Теоретическая длина программы (Nт): ", self.total_operators_count + self.total_operands_count)
+        n = self.unique_operators_count + self.unique_operands_count
+        print("Алфавит (n): ", n)
+
+        Ne = self.total_operators_count + self.total_operands_count
+        print("Экспериментальна длина программы (Nэ): ", Ne)
+        Nt = n1 * math.log(n1, 2) + n2 * math.log(n2, 2)
+        print("Теоретическая длина программы (Nт): ", Nt)
+
+        V = Ne * math.log(n, 2)
+        print("Объем программы (V): ", V)
+
+        n1s, n2s = self.get_theoretical_program_dictionary()
+
+        Vs = Nt * math.log(n1s + n2s, 2)
+        print("Потенциальный oбъем (V*): ", Vs)
+
+        L = Vs / V
+        print("Уровень программы (L): ", L)
+
+        S = 1 / L
+        print("Сложность программы (S): ", S)
+
+        Ls = (2 / n2)*(n2 / N2)
+        print("Ожидание уровня программы (L'): ", Ls)
+
+        D = 1 / Ls
+        print("Трудоемкость кодирования программы (D): ", D)
+
+        I = V / D
+        print("Интеллект программы (I): ", I)
+
+        E = Nt * math.log(n/L, 2)
+        print("Оценка необходимых интеллектуальных усилий при разработке (E): ", E)

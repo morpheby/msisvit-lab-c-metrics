@@ -7,10 +7,6 @@ def get_function_declaration(text):
     cppwords = ['if', 'while', 'do', 'for', 'switch', 'main']
     functions = [(i.group(1), i.group(2), i.group(3)) for i in re.finditer(rproc, text) if i.group(2) not in cppwords]
 
-    for function in functions:
-        print(function[0])
-        print(function[1] + '(' + function[2] + ')')
-
     return functions
 
 
