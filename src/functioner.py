@@ -36,6 +36,9 @@ def propagate_functions(text):
             main_f = f
             break
 
+    if main_f == None:
+        raise SyntaxError('No entry point present')
+
     main_body = find_function_body(text, main_f)
     
     counter = 1
@@ -53,4 +56,6 @@ def propagate_functions(text):
 
     return main_body
 
+
+# vim:tabstop=4:shiftwidth=4:expandtab
 

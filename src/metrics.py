@@ -3,7 +3,7 @@
 """ Entry point for metrics app """
 
 
-import sys, getopt, helper, code_cleanup, functioner, graph, holsted
+import sys, getopt, helper, code_cleanup, functioner, graph, holsted, myers
 
 def usage():
     """ Outputs usage info """
@@ -30,8 +30,6 @@ def main(argv):
     else:
         input_file = open(args[0], 'r')
     
-    print(use_metric)
-
     print('\n')
 
     text = input_file.read()
@@ -41,19 +39,20 @@ def main(argv):
         h.run()
     elif use_metric == 'myers':
         text = code_cleanup.cleanup_strings(code_cleanup.cleanup_sharp(code_cleanup.cleanup_comments(text)))
-        print(text)
-        
         g = graph.ExecGraph(text)
         g.build_graph()
-        print('\n*********************************************\n')
-        print(g.filtered_text)
-        print('\n*********************************************\n')
-        g.print_tree()
+        m = myers.Myers(g, text)
+        m.analyze()
+        print('Метрика Майерса:', m.metric())
 
 try:
     main(sys.argv)
+except SyntaxError:
+    (_, text, _) = sys.exc_info()
+    print(text)
 except:
     print('Syntax parsing error')
+    print(sys.exc_info())
 
 
 

@@ -40,12 +40,13 @@ class ExecGraph:
         self.build_graph()
         self.finish_node = None
         self.root_node = None
-    
-    
+   
+
     def build_graph(self):
         """ Rebuilds execution graph """
        
         self.filtered_text = helper.extract_args(self.code)
+        self.predicates = 0
         self.filtered_text = functioner.propagate_functions(self.filtered_text)
         self.finish_node = ExecNode('finish', None)
         self.root_node = ExecNode('root', self.finish_node)
@@ -72,7 +73,7 @@ class ExecGraph:
         index = 0
         
         while True:
-            (found, operator) = find_first(text, ['if', 'else', 'elseif', 'while'], index)
+            (found, operator) = find_first(text, ['if', 'else', 'elseif', 'while', 'for'], index)
             if found < 0:
                 break
             index = found
@@ -119,7 +120,7 @@ class ExecGraph:
 
                 self._build_node(text[block_start:block_end], new_node)
 
-            elif operator == 'while':
+            elif operator == 'while' or operator == 'for':
                 endnode = ExecNode('endwhile', node.wants_endnode)
                 new_node = ExecNode('while', None)
                 new_node.wants_endnode = new_node
@@ -145,12 +146,5 @@ class ExecGraph:
         node.children.append(node.endnode)
 
 
-
-                 
-
-
-
-
-
-
+# vim:tabstop=4:shiftwidth=4:expandtab
 
