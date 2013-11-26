@@ -56,12 +56,22 @@ def parse_operand(text):
 
 
 def extract_args(text):
+    old = ""
+    new_text = text
+    while old != new_text:
+        old = new_text
+        new_text = __extract_args(new_text)
+    return new_text
+    
+
+
+def __extract_args(text):
     """ Extracts all arguments from operators and function calls """
     
-    text = text.replace('else', 'else()')
+    text = text.replace('else if', 'elseif')
 
-    operand_finder = re.compile(r'^(.+[\s;}])?(if|else|while|switch|for)\s*\(', re.MULTILINE)
-    funct_finder = re.compile(r'^(.+[\s;}])?([a-zA-Z_][0-9a-zA-Z_]*)\s*\(', re.MULTILINE)
+    operand_finder = re.compile(r'^(.+[\s;}])?(if|elseif|while|switch|for)\s*\(', re.MULTILINE)
+    funct_finder = re.compile(r'^(.*?[\s;}\(\){])?([a-zA-Z_][0-9a-zA-Z_]*)\s*\(', re.MULTILINE)
     
     new_text = ""
 
@@ -76,7 +86,7 @@ def extract_args(text):
             if body.strip()[0] != '{':
                 body = '{\n' + body.split(';')[0] + '\n}'
             # Move args
-            new_text += text[last_pos:start] + '\n' + args + '\n' + text[start:start+indices['args_start']] + body
+            new_text += text[last_pos:start] + '\n' + args + ';\n' + text[start:start+indices['args_start']] + body
             last_pos = start+indices['body_end']
     
     new_text += text[last_pos:]
@@ -90,16 +100,32 @@ def extract_args(text):
     for operator in funct_finder.finditer(text):
         start = operator.start(2)
         (operand_name, args, body, indices) = parse_operand(text[start:])
-        if operand_name in ['if', 'while', 'else', 'for', 'switch', 'return']:
+        if operand_name in ['if', 'while', 'elseif', 'for', 'switch', 'return']:
             continue
-        if len(body.strip()) != 0:
+        if len(body.strip()) != 0 and body.strip() != ';':
             # This seems to be a declaration. Not what we are looking for
             continue
         if len(args) != 0:
             # Move args
-            new_text += text[last_pos:start] + '\n' + args + '\n' + text[start:start+indices['args_start']]
+            if args[-1] == ')':
+                args = args[:-1]
+            if args[0] == '(':
+                args = args[1:]
+            new_text += text[last_pos:start] + '\n' + args + ';\n' + text[start:start+indices['args_start']]
             last_pos = start+indices['args_end']
     
+    new_text += text[last_pos:]
+
+    text = new_text
+    new_text = ""
+    last_pos = 0
+
+    # Fix else's without brackets
+    else_finder = re.compile(r'^(.+[\s;}])?(else)\s+[^{;]*;', re.MULTILINE)
+
+    for operator in else_finder.finditer(text):
+        new_text += text[last_pos:operator.end(2)] + ' {\n' + text[operator.end(2):operator.end(0)] + '\n}'
+        last_pos = operator.end(0)
     new_text += text[last_pos:]
 
     return new_text

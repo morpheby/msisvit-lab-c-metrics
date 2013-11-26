@@ -43,8 +43,6 @@ class Holsted:
         self.total_operators_count += total_operators
         self.unique_operators_count += len(unique_operators)
 
-        print(self.cleaned_code)
-
         unique_functions = set()
         count = len(re.findall(function_regex, self.cleaned_code))
         cleanup_code = re.sub(function_regex, lambda match: [unique_functions.add(match.group(0)), " "][0], self.cleaned_code)
@@ -52,13 +50,9 @@ class Holsted:
         self.total_operators_count += count
         self.unique_operators_count += len(unique_functions)
 
-        print(self.cleaned_code)
-
     def get_all_operands(self):
         for key in key_words:
             self.cleaned_code = self.cleaned_code.replace(key, " ")
-
-        print(self.cleaned_code)
 
         operands = re.findall(operand_regex, self.cleaned_code)
         self.total_operands_count = len(operands)

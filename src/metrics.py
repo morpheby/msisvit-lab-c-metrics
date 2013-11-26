@@ -3,7 +3,7 @@
 """ Entry point for metrics app """
 
 
-import sys, getopt
+import sys, getopt, helper, code_cleanup, functioner, graph, holsted
 
 def usage():
     """ Outputs usage info """
@@ -29,10 +29,33 @@ def main(argv):
         input_file = sys.stdin
     else:
         input_file = open(args[0], 'r')
-    print(input_file)
+    
     print(use_metric)
 
-main(sys.argv)
+    print('\n')
+
+    text = input_file.read()
+    
+    if use_metric == 'holsted':
+        h = holsted.Holsted(text)
+        h.run()
+    elif use_metric == 'myers':
+        text = code_cleanup.cleanup_strings(code_cleanup.cleanup_sharp(code_cleanup.cleanup_comments(text)))
+        print(text)
+        
+        g = graph.ExecGraph(text)
+        g.build_graph()
+        print('\n*********************************************\n')
+        print(g.filtered_text)
+        print('\n*********************************************\n')
+        g.print_tree()
+
+try:
+    main(sys.argv)
+except:
+    print('Syntax parsing error')
+
+
 
 
 

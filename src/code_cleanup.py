@@ -8,6 +8,9 @@ def cleanup_and_get_strings_count(text):
     cleanup_code = re.sub("L?\"(\\\\.|[^\\\\\"])*\"", lambda match: (all_strings.add(match.group(0))), text)
     return cleanup_code, count, len(all_strings)
 
+def cleanup_strings(text):
+    cleanup_code = re.sub("L?\"(\\\\.|[^\\\\\"])*\"", '', text)
+    return cleanup_code
 
 def cleanup_comments(text):
     without_comments = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", text)
