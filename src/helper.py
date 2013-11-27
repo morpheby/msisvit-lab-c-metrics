@@ -91,7 +91,6 @@ def __extract_args(text):
     operand_name = ''
     last_pos = 0
     while True:
-        print(text)
         operator = funct_finder.search(text, last_pos)
         if operator == None:
             break;
@@ -104,7 +103,6 @@ def __extract_args(text):
         if len(body.strip()) != 0 and body.strip() != ';':
             # This seems to be a declaration. Not what we are looking for
             continue
-        print ('Body:', body, 'endbody')
         if len(args) != 0:
             # Move args
             if args[-1] == ')':
