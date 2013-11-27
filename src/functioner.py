@@ -28,7 +28,6 @@ def find_function_body(text, function):
 
 def propagate_functions(text):
     functs = get_function_declaration(text)
-
     main_f = None
 
     for f in functs:

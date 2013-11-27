@@ -73,11 +73,11 @@ def __extract_args(text):
     operand_finder = re.compile(r'^(.+[\s;}])?(if|elseif|while|switch|for)\s*\(', re.MULTILINE)
     funct_finder = re.compile(r'^(.*?[\s;}\(\){])?([a-zA-Z_][0-9a-zA-Z_]*)\s*\(', re.MULTILINE)
     
-    new_text = ""
+    while True:
+        operator = operand_finder.search(text)
+        if operator == None:
+            break;
 
-    last_pos = 0
-
-    for operator in operand_finder.finditer(text):
         start = operator.start(2)
         (operand_name, args, body, indices) = parse_operand(text[start:])
         if len(args) != 0:
@@ -86,51 +86,48 @@ def __extract_args(text):
             if body.strip()[0] != '{':
                 body = '{\n' + body.split(';')[0] + '\n}'
             # Move args
-            new_text += text[last_pos:start] + '\n' + args + ';\n' + text[start:start+indices['args_start']] + body
-            last_pos = start+indices['body_end']
-    
-    new_text += text[last_pos:]
-    
-    text = new_text
-    
-    new_text = ""
-
+            text = text[:start] + '\n' + args + ';\n' + text[start:start+indices['args_start']] + body + text[start+indices['body_end']:]
+   
+    operand_name = ''
     last_pos = 0
-
-    for operator in funct_finder.finditer(text):
+    while True:
+        print(text)
+        operator = funct_finder.search(text, last_pos)
+        if operator == None:
+            break;
+        
         start = operator.start(2)
+        last_pos = operator.end(2)
         (operand_name, args, body, indices) = parse_operand(text[start:])
-        if operand_name in ['if', 'while', 'elseif', 'for', 'switch', 'return']:
+        if operand_name in ['if', 'while', 'elseif', 'for', 'switch', 'return']: 
             continue
         if len(body.strip()) != 0 and body.strip() != ';':
             # This seems to be a declaration. Not what we are looking for
             continue
+        print ('Body:', body, 'endbody')
         if len(args) != 0:
             # Move args
             if args[-1] == ')':
                 args = args[:-1]
             if args[0] == '(':
                 args = args[1:]
-            new_text += text[last_pos:start] + '\n' + args + ';\n' + text[start:start+indices['args_start']]
-            last_pos = start+indices['args_end']
+            text = text[:start] + '\n' + args + ';\n' + text[start:start+indices['args_start']] + text[start+indices['args_end']:]
     
-    new_text += text[last_pos:]
-
-    text = new_text
-    new_text = ""
-    last_pos = 0
-
     # Fix else's without brackets
     else_finder = re.compile(r'^(.+[\s;}])?(else)\s+[^{;]*;', re.MULTILINE)
 
-    for operator in else_finder.finditer(text):
-        new_text += text[last_pos:operator.end(2)] + ' {\n' + text[operator.end(2):operator.end(0)] + '\n}'
-        last_pos = operator.end(0)
-    new_text += text[last_pos:]
+    
+    while True:
+        operator = else_finder.search(text)
+        if operator == None:
+            break;
+        
+        text = text[:operator.end(2)] + ' {\n' + text[operator.end(2):operator.end(0)] + '\n}' + text[operator.end(0):]
 
-    return new_text
+    return text
     
 
 
 
+# vim:tabstop=4:shiftwidth=4:expandtab
 

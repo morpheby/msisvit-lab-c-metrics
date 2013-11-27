@@ -48,6 +48,7 @@ class ExecGraph:
         self.filtered_text = helper.extract_args(self.code)
         self.predicates = 0
         self.filtered_text = functioner.propagate_functions(self.filtered_text)
+        print(self.filtered_text)
         self.finish_node = ExecNode('finish', None)
         self.root_node = ExecNode('root', self.finish_node)
         self._build_node(self.filtered_text, self.root_node)
