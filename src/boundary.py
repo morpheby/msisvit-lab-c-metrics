@@ -19,12 +19,12 @@ def node_complexity(node):
     if node.name == 'while':
         # Child, which has wants_endnode == self is start of subgraph
         whilenode = None
+        complexity = 0
+        passed = set()
         for child in node.children:
-            if child.wants_endnode == node:
-                whilenode = child
-                break
-        assert whilenode != None, 'Bad execution graph for while/endwhile clause'
-        return count_nodes(whilenode, set(), whilenode)
+            if child.name != 'endwhile':
+                complexity += count_nodes(child, passed, node)
+        return complexity
     elif len(node.children) > 1:
         endnode = None
         complexity = 1
@@ -74,7 +74,7 @@ class Boundary:
                     not_passed.add(child)
 
     def metric(self):
-        return (self.node_count, self.abs_compxt)
+        return 1 - (self.node_count - 1)/self.abs_compxt
 
 
 # vim:tabstop=4:shiftwidth=4:expandtab

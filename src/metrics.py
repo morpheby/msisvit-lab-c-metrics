@@ -50,18 +50,18 @@ def main(argv):
         g.build_graph()
         b = boundary.Boundary(g)
         b.analyze()
-        print('Метрика Майерса:', b.metric())
+        print('Метрика граничных значений:', b.metric())
 
 
 
-#try:
-main(sys.argv)
-#except SyntaxError:
-#    (_, text, _) = sys.exc_info()
-#    print(text)
-#except:
-#    print('Syntax parsing error')
-#    print(sys.exc_info())
+try:
+    main(sys.argv)
+except SyntaxError:
+    (_, text, _) = sys.exc_info()
+    print(text)
+except:
+    print('Syntax parsing error')
+    print(sys.exc_info())
 
 
 
