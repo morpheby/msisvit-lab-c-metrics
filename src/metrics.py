@@ -3,7 +3,7 @@
 """ Entry point for metrics app """
 
 
-import sys, getopt, helper, code_cleanup, functioner, graph, holsted, myers
+import sys, getopt, helper, code_cleanup, functioner, graph, holsted, myers, boundary
 
 def usage():
     """ Outputs usage info """
@@ -44,15 +44,24 @@ def main(argv):
         m = myers.Myers(g, text)
         m.analyze()
         print('Метрика Майерса:', m.metric())
+    elif use_metric == 'boundary':
+        text = code_cleanup.cleanup_strings(code_cleanup.cleanup_sharp(code_cleanup.cleanup_comments(text)))
+        g = graph.ExecGraph(text)
+        g.build_graph()
+        b = boundary.Boundary(g)
+        b.analyze()
+        print('Метрика Майерса:', b.metric())
 
-try:
-    main(sys.argv)
-except SyntaxError:
-    (_, text, _) = sys.exc_info()
-    print(text)
-except:
-    print('Syntax parsing error')
-    print(sys.exc_info())
+
+
+#try:
+main(sys.argv)
+#except SyntaxError:
+#    (_, text, _) = sys.exc_info()
+#    print(text)
+#except:
+#    print('Syntax parsing error')
+#    print(sys.exc_info())
 
 
 
