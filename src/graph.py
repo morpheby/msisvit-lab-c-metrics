@@ -112,8 +112,8 @@ class ExecGraph:
             
             elif operator == 'elseif':
                 new_node = ExecNode('elseif', node)
-                new_node.parents.append(node)
-                node.children.append(new_node)
+                new_node.parents.append(oldnode)
+                oldnode.children.append(new_node)
                 
                 block_start = text.find('{', index)
                 block_end = block_start + helper.find_adjacent_bracket(text[block_start:], '{}')
