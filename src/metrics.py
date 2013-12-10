@@ -23,16 +23,21 @@ def main(argv):
         else:
             usage()
     
-    if len(args) != 1:
+    if len(args) < 1:
         usage()
     elif args[0] == '-':
-        input_file = sys.stdin
+        input_files = [sys.stdin]
     else:
-        input_file = open(args[0], 'r')
+        input_files = []
+        for arg in args:
+            input_files.append(open(arg, 'r'))
     
     print('\n')
 
-    text = input_file.read()
+    text = ""
+    
+    for file in input_files:
+        text = text + '\n' + file.read()
     
     if use_metric == 'holsted':
         h = holsted.Holsted(text)

@@ -11,18 +11,22 @@ def get_function_declaration(text):
 
 
 def find_function_body(text, function):
-    position = text.find(function[0])
-    if position != -1:
+    position = 0
+    while position < len(text):
+        position = text.find(function[0], position)
+        if position != -1:
 
-        #get first open bracket
-        while text[position] != "{" and text[position] != ";" and position != len(text):
-            position += 1
-        if text[position] == "{":
-            start = position
-            end = start + helper.find_adjacent_bracket(text[position:], "{}")
-            return text[start:end]
-
-        raise SystemError("Incorrect bracket positions")
+            #get first open bracket
+            while (not text[position] in ['{', '}', ';']) and position != len(text):
+                position += 1
+            if text[position] == "{":
+                start = position
+                end = start + helper.find_adjacent_bracket(text[position:], "{}")
+                return text[start:end]
+            else:
+                continue
+    
+    raise SyntaxError("Incorrect bracket positions for function {0} in \n----------\n...{1}\n----------\n".format(function, text[position-50:]))
 
 
 

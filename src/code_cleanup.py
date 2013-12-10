@@ -19,5 +19,5 @@ def cleanup_comments(text):
 
 
 def cleanup_sharp(text):
-    text = re.compile(r"#[^#\n]*\n", re.DOTALL).sub("", text)
+    text = re.compile(r"^\s*#[^\r\n]*$", re.DOTALL | re.MULTILINE).sub("", text)
     return text
